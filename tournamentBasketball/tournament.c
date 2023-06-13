@@ -17,13 +17,17 @@ float overAllCalculatorTeam(struct team t, struct manager m) {
 }
 
 float overAllCalculatorManager(struct manager m) {
+	if (m.losts == 0 || m.wins == 0) {
+		return 0.0;
+	}
+
 	float cal = m.losts + m.wins;
 	float over = cal / 2;
 
 	return over;
 }
 
-int LeugeDisder(struct team t) {
+int LeugeDisider(struct team t) {
 	
 	if (t.overallScore <= 50) {
 		return THIRD;
@@ -37,17 +41,11 @@ int LeugeDisder(struct team t) {
 
 }
 
-int matchDisder(struct tournament l1, 
+int matchDisider(struct tournament l1, 
 	struct tournament l2, struct tournament l3) {
-	
+	//Takes only the actual memory used not allocated
 	for (int i = 0; i < (int*) malloc(l1.teams); i++) {
 
 	}
 
-}
-
-void init() {
-	struct manager Rick;
-	 Rick.id = 1;
-	printf("Initialized");
 }

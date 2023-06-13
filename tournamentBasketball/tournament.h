@@ -49,9 +49,10 @@ struct tournament {
 float overAllCalculatorPlayer(struct player p);
 float overAllCalculatorTeam(struct team t, struct manager m);
 float overAllCalculatorManager(struct manager m);
-int matchDisder();
-int LeugeDisder(struct team t);
-void init();
+int matchDisider(struct tournament l1,
+	struct tournament l2, struct tournament l3);
+int LeugeDisider(struct team t);
+
 
 
 #endif // !TOR_H_
