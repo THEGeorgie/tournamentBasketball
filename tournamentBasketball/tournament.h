@@ -5,37 +5,9 @@ enum Leuges {
 	FIRST = 1,
 	SECOND = 2,
 	THIRD = 3
-}leuges;
-
-struct player {
-	int id;
-	char name[50];
-	char surname[50];
-	float overallScore;
-	int speed;
-	int dribling;
-	int accuracy;
 };
 
-struct team {
-	int id;
-	char name[50];
-	int players[3];
-	float overallScore;
-	int leuge;
-	int manager;
-	int wins;
-	int losts;
-};
 
-struct manager {
-	int id;
-	char name[50];
-	char surnname[50];
-	int wins;
-	int losts;
-	float overallScore;
-};
 
 struct tournament {
 	int leuge;
@@ -46,13 +18,11 @@ struct tournament {
 };
 
 
-float overAllCalculatorPlayer(struct player p);
-float overAllCalculatorTeam(struct team t, struct manager m);
-float overAllCalculatorManager(struct manager m);
-int matchDisider(struct tournament l1,
-	struct tournament l2, struct tournament l3);
-int LeugeDisider(struct team t);
-
+float overAllCalculatorPlayer();
+float overAllCalculatorTeam();
+float overAllCalculatorManager();
+int matchDisider();
+int LeugeDisider();
 
 
 #endif // !TOR_H_
