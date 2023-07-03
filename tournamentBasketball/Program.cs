@@ -37,6 +37,13 @@ namespace SQLiteDemo
                 case 'a':
                     Console.Clear();
                     ReadData(sqlite_conn, "TEAM", "");
+
+                    String expre = Console.ReadLine();
+                    string[] words = expre.Split();
+                    if (words[0] == "select")
+                    {
+                        ReadData(sqlite_conn, "TEAM", string.Concat("name = ", words[1]));
+                    }
                     break;
                 case 'b':
                     break;
@@ -44,7 +51,7 @@ namespace SQLiteDemo
                     break;
             }
 
-
+      
 
 
             Console.ReadKey();
@@ -84,25 +91,23 @@ namespace SQLiteDemo
 
         }
 
-        static void ReadData(SQLiteConnection conn, String coll, String expression)
+        static void ReadData(SQLiteConnection conn, string coll, string expression)
         {
             SQLiteDataReader sqlite_datareader;
             SQLiteCommand sqlite_cmd;
             sqlite_cmd = conn.CreateCommand();
-            if (expression == "")
-            {
-                sqlite_cmd.CommandText = string.Concat("SELECT * FROM ", coll) + ";";
+            if (expression == "") {
+                sqlite_cmd.CommandText = string.Concat("SELECT name FROM ", coll) + ";";
             }
             else
             {
-                sqlite_cmd.CommandText = string.Concat("SELECT * FROM ", coll) + " " + expression + ";";
+                sqlite_cmd.CommandText = string.Concat("SELECT * FROM", coll) + "WHERE " + expression + ";";
             }
 
             sqlite_datareader = sqlite_cmd.ExecuteReader();
             while (sqlite_datareader.Read())
             {
-                string myreader = sqlite_datareader.GetString(0);
-                Console.WriteLine(myreader);
+                Console.WriteLine(sqlite_datareader.GetString(0));
             }
             conn.Close();
         }
