@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Data.SQLite;
@@ -7,10 +8,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace SQLiteDemo
 {
     class Program
     {
+
+        struct Team {
+            public string name;
+            public int manager;
+            public int wins;
+            public int losts;
+            public float overAll;
+        }
 
         static void Main(string[] args)
         {
@@ -35,14 +45,33 @@ namespace SQLiteDemo
             switch (input)
             {
                 case 'a':
-                    Console.Clear();
-                    ReadData(sqlite_conn, "TEAM", "");
+                    while (true) {
+                        Console.Clear();
+                        ReadData(sqlite_conn, "TEAM");
+                        SQLiteConnection sqlite;
+                        sqlite = CreateConnection();
+                        string inputLocal = Console.ReadLine(); 
+                        if (inputLocal == "exit")
+                        {
+                            break;
+                        }
+                        else {
+                            string[] words = inputLocal.Split();
+                            string prep = "\"" + words[1] + "\"";
+                            switch (words[0])
+                            {
+                                case "select":
+                                    SaveData(sqlite, "TEAM", string.Concat("name = ", prep));
+                                    break;
+                                case "show":
+                                    ReadData(sqlite, "TEAM", string.Concat("name = ", prep));
+                                    break;
+                                default:
+                                    Console.WriteLine("Unknown Command");
+                                    break;
 
-                    String expre = Console.ReadLine();
-                    string[] words = expre.Split();
-                    if (words[0] == "select")
-                    {
-                        ReadData(sqlite_conn, "TEAM", string.Concat("name = ", words[1]));
+                            }
+                        }
                     }
                     break;
                 case 'b':
@@ -51,12 +80,23 @@ namespace SQLiteDemo
                     break;
             }
 
-      
-
-
-            Console.ReadKey();
         }
+        static void ReadInput(SQLiteConnection conn, SQLiteConnection conn1, string expre) {
+            string[] words = expre.Split();
+            string prep = "\"" + words[1] + "\"";
+            switch (words[0]) {
+                case "select":               
+                    SaveData(conn, "TEAM", string.Concat("name = ", prep));
+                    break;
+                case "show":
+                    ReadData(conn1, "TEAM", string.Concat("name = ", prep));
+                    break;
+                default:
+                    Console.WriteLine("Unknown Command");
+                    break; 
 
+            }
+        }
         static SQLiteConnection CreateConnection()
         {
 
@@ -91,24 +131,65 @@ namespace SQLiteDemo
 
         }
 
-        static void ReadData(SQLiteConnection conn, string coll, string expression)
+        static void ReadData(SQLiteConnection conn, string coll) {
+            SQLiteDataReader sqlite_datareader;
+            SQLiteCommand sqlite_cmd;
+            sqlite_cmd = conn.CreateCommand();
+
+                sqlite_cmd.CommandText = string.Concat("SELECT name FROM ", coll) + ";";
+                    sqlite_datareader = sqlite_cmd.ExecuteReader();
+                    while (sqlite_datareader.Read())
+                    {
+                        Console.WriteLine(sqlite_datareader.GetString(0));
+                    }
+
+            conn.Close();
+        }
+        static void ReadData(SQLiteConnection conn, string coll, string expression) {
+            SQLiteDataReader sqlite_datareader;
+            SQLiteDataReader sqlite_datareader1;
+            SQLiteCommand sqlite_cmd;
+            SQLiteCommand sqlite_cmd1;
+            sqlite_cmd = conn.CreateCommand();
+            sqlite_cmd.CommandText = string.Concat("SELECT * FROM ", coll) + " WHERE " + expression + ";";
+            sqlite_datareader = sqlite_cmd.ExecuteReader();
+            while (sqlite_datareader.Read())
+            {
+                string name = sqlite_datareader.GetString(1);
+                int manager = sqlite_datareader.GetInt32(2);
+                int wins = sqlite_datareader.GetInt32(3);
+                int losts = sqlite_datareader.GetInt32(4);
+                float overAll = sqlite_datareader.GetFloat(5);
+                sqlite_cmd1 = conn.CreateCommand();
+                sqlite_cmd1.CommandText = $"SELECT name FROM MANAGER WHERE m_id = {manager}";
+                sqlite_datareader1 = sqlite_cmd1.ExecuteReader();
+                while (sqlite_datareader1.Read()) {
+                    Console.WriteLine($"NAME: {name}, MANAGER: {sqlite_datareader1.GetString(0)}, WINS: {wins}, LOSTS: {losts}, OVERALL: {overAll}");
+                }
+                
+            }
+                
+            conn.Close();
+        }
+        static void SaveData(SQLiteConnection conn, string coll, string expression)
         {
             SQLiteDataReader sqlite_datareader;
             SQLiteCommand sqlite_cmd;
             sqlite_cmd = conn.CreateCommand();
-            if (expression == "") {
-                sqlite_cmd.CommandText = string.Concat("SELECT name FROM ", coll) + ";";
-            }
-            else
-            {
-                sqlite_cmd.CommandText = string.Concat("SELECT * FROM", coll) + "WHERE " + expression + ";";
-            }
-
+            sqlite_cmd.CommandText = string.Concat("SELECT * FROM ", coll) + " WHERE " + expression + ";";
             sqlite_datareader = sqlite_cmd.ExecuteReader();
+            Team team1 = new Team();
             while (sqlite_datareader.Read())
             {
-                Console.WriteLine(sqlite_datareader.GetString(0));
+                team1.name = sqlite_datareader.GetString(1);
+                team1.manager = sqlite_datareader.GetInt32(2);
+                team1.wins = sqlite_datareader.GetInt32(3);
+                team1.losts = sqlite_datareader.GetInt32(4);
+                team1.overAll = sqlite_datareader.GetFloat(5);
             }
+
+            Console.WriteLine("Succsefuly saved team!!");
+
             conn.Close();
         }
     }
