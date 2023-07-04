@@ -9,18 +9,17 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace SQLiteDemo
-{
+namespace SQLiteDemo {
+    struct Team
+    {
+        public string name;
+        public int manager;
+        public int wins;
+        public int losts;
+        public float overAll;
+    }
     class Program
     {
-
-        struct Team {
-            public string name;
-            public int manager;
-            public int wins;
-            public int losts;
-            public float overAll;
-        }
 
         static void Main(string[] args)
         {
@@ -39,46 +38,40 @@ namespace SQLiteDemo
                 Console.WriteLine("You fucked up somethin");
             }
 
-            SQLiteConnection sqlite_conn;
-            sqlite_conn = CreateConnection();
-
-            switch (input)
-            {
-                case 'a':
-                    while (true) {
-                        Console.Clear();
-                        ReadData(sqlite_conn, "TEAM");
-                        SQLiteConnection sqlite;
-                        sqlite = CreateConnection();
-                        string inputLocal = Console.ReadLine(); 
-                        if (inputLocal == "exit")
-                        {
-                            break;
-                        }
-                        else {
-                            string[] words = inputLocal.Split();
-                            string prep = "\"" + words[1] + "\"";
-                            switch (words[0])
-                            {
-                                case "select":
-                                    SaveData(sqlite, "TEAM", string.Concat("name = ", prep));
-                                    break;
-                                case "show":
-                                    ReadData(sqlite, "TEAM", string.Concat("name = ", prep));
-                                    break;
-                                default:
-                                    Console.WriteLine("Unknown Command");
-                                    break;
-
+                switch (input) {
+                    case 'a':
+                            Console.Clear();
+                            ReadData(sqlite_conn, "TEAM");
+                            SQLiteConnection sqlite;
+                            sqlite = CreateConnection();
+                            string inputLocal = Console.ReadLine();
+                            if (inputLocal == "exit") {
+                                break;
                             }
-                        }
-                    }
-                    break;
-                case 'b':
-                    break;
-                default:
-                    break;
-            }
+                            else
+                            {
+                                string[] words = inputLocal.Split();
+                                string prep = "\"" + words[1] + "\"";
+                                switch (words[0])
+                                {
+                                    case "select":
+                                        SaveData(sqlite, "TEAM", string.Concat("name = ", prep));
+                                        break;
+                                    case "show":
+                                        ReadData(sqlite, "TEAM", string.Concat("name = ", prep));
+                                        break;
+                                    default:
+                                        Console.WriteLine("Unknown Command");
+                                        break;
+
+                                }
+                            }
+                        break;
+                    case 'b':
+                        break;
+                    default:
+                        break;
+                }
 
         }
         static void ReadInput(SQLiteConnection conn, SQLiteConnection conn1, string expre) {
@@ -96,6 +89,15 @@ namespace SQLiteDemo
                     break; 
 
             }
+        }
+        
+
+        
+    }
+    class Database {
+        Database() {
+            SQLiteConnection sqlite_conn;
+            sqlite_conn = CreateConnection();
         }
         static SQLiteConnection CreateConnection()
         {
@@ -131,21 +133,23 @@ namespace SQLiteDemo
 
         }
 
-        static void ReadData(SQLiteConnection conn, string coll) {
+        static void ReadData(SQLiteConnection conn, string coll)
+        {
             SQLiteDataReader sqlite_datareader;
             SQLiteCommand sqlite_cmd;
             sqlite_cmd = conn.CreateCommand();
 
-                sqlite_cmd.CommandText = string.Concat("SELECT name FROM ", coll) + ";";
-                    sqlite_datareader = sqlite_cmd.ExecuteReader();
-                    while (sqlite_datareader.Read())
-                    {
-                        Console.WriteLine(sqlite_datareader.GetString(0));
-                    }
+            sqlite_cmd.CommandText = string.Concat("SELECT name FROM ", coll) + ";";
+            sqlite_datareader = sqlite_cmd.ExecuteReader();
+            while (sqlite_datareader.Read())
+            {
+                Console.WriteLine(sqlite_datareader.GetString(0));
+            }
 
             conn.Close();
         }
-        static void ReadData(SQLiteConnection conn, string coll, string expression) {
+        static void ReadData(SQLiteConnection conn, string coll, string expression)
+        {
             SQLiteDataReader sqlite_datareader;
             SQLiteDataReader sqlite_datareader1;
             SQLiteCommand sqlite_cmd;
@@ -163,12 +167,13 @@ namespace SQLiteDemo
                 sqlite_cmd1 = conn.CreateCommand();
                 sqlite_cmd1.CommandText = $"SELECT name FROM MANAGER WHERE m_id = {manager}";
                 sqlite_datareader1 = sqlite_cmd1.ExecuteReader();
-                while (sqlite_datareader1.Read()) {
+                while (sqlite_datareader1.Read())
+                {
                     Console.WriteLine($"NAME: {name}, MANAGER: {sqlite_datareader1.GetString(0)}, WINS: {wins}, LOSTS: {losts}, OVERALL: {overAll}");
                 }
-                
+
             }
-                
+
             conn.Close();
         }
         static void SaveData(SQLiteConnection conn, string coll, string expression)
