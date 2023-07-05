@@ -27,6 +27,8 @@ namespace SQLiteDemo {
             Console.WriteLine("---------------------------------");
             Console.WriteLine("--MINI  BASCKETBALL  TOURNAMENT--");
             Console.WriteLine("---------------------------------");
+            SQLiteConnection sqlConn;
+            sqlConn = CreateConnection();
 
             Console.Write("Select team, make team, edit Team (a,b: ");
             try
@@ -35,13 +37,13 @@ namespace SQLiteDemo {
             }
             catch (Exception e)
             {
-                Console.WriteLine("You fucked up somethin");
+                Console.WriteLine("Please input only a,b or c");
             }
 
                 switch (input) {
                     case 'a':
                             Console.Clear();
-                            ReadData(sqlite_conn, "TEAM");
+                            Database.ReadInput(sqlConn, "show all TEAM");
                             SQLiteConnection sqlite;
                             sqlite = CreateConnection();
                             string inputLocal = Console.ReadLine();
@@ -50,21 +52,7 @@ namespace SQLiteDemo {
                             }
                             else
                             {
-                                string[] words = inputLocal.Split();
-                                string prep = "\"" + words[1] + "\"";
-                                switch (words[0])
-                                {
-                                    case "select":
-                                        SaveData(sqlite, "TEAM", string.Concat("name = ", prep));
-                                        break;
-                                    case "show":
-                                        ReadData(sqlite, "TEAM", string.Concat("name = ", prep));
-                                        break;
-                                    default:
-                                        Console.WriteLine("Unknown Command");
-                                        break;
-
-                                }
+                                Database.ReadInput(sqlite,inputLocal);
                             }
                         break;
                     case 'b':
@@ -72,49 +60,61 @@ namespace SQLiteDemo {
                     default:
                         break;
                 }
+            static SQLiteConnection CreateConnection()
+            {
 
-        }
-        static void ReadInput(SQLiteConnection conn, SQLiteConnection conn1, string expre) {
-            string[] words = expre.Split();
-            string prep = "\"" + words[1] + "\"";
-            switch (words[0]) {
-                case "select":               
-                    SaveData(conn, "TEAM", string.Concat("name = ", prep));
-                    break;
-                case "show":
-                    ReadData(conn1, "TEAM", string.Concat("name = ", prep));
-                    break;
-                default:
-                    Console.WriteLine("Unknown Command");
-                    break; 
+                SQLiteConnection sqlite_conn;
+                // Create a new database connection:
+                sqlite_conn = new SQLiteConnection("Data Source= database.db; Version = 3; New = True; Compress = True; ");
+                // Open the connection:
+                try
+                {
+                    sqlite_conn.Open();
+                }
+                catch (Exception ex)
+                {
 
+                }
+                return sqlite_conn;
             }
+
         }
+        
         
 
         
     }
     class Database {
-        Database() {
-            SQLiteConnection sqlite_conn;
-            sqlite_conn = CreateConnection();
-        }
-        static SQLiteConnection CreateConnection()
-        {
+        public static void ReadInput(SQLiteConnection conn, string expre) {
+            string[] words = expre.Split();
+            if (words.Length > 1) {
+                string prep = "\"" + words[1] + "\"";
+                switch (words[0])
+                {
+                    case "select":
+                        SaveData(conn, "TEAM", string.Concat("name = ", prep));
+                        break;
+                    case "show":
+                        if (words[1] == "all") {
+                            ReadData(conn, "TEAM");
+                        }
+                        else {
+                            ReadData(conn, "TEAM", string.Concat("name = ", prep));
+                        }
+                       
+                        break;
+                    default:
+                        Console.WriteLine("Unknown Command");
+                        break;
 
-            SQLiteConnection sqlite_conn;
-            // Create a new database connection:
-            sqlite_conn = new SQLiteConnection("Data Source= database.db; Version = 3; New = True; Compress = True; ");
-            // Open the connection:
-            try
-            {
-                sqlite_conn.Open();
+                }
             }
-            catch (Exception ex)
+            else
             {
+                Console.WriteLine("Not enough arguments!!");
+            }
 
-            }
-            return sqlite_conn;
+
         }
         static void InsertData(SQLiteConnection conn)
         {
@@ -196,6 +196,12 @@ namespace SQLiteDemo {
             Console.WriteLine("Succsefuly saved team!!");
 
             conn.Close();
+        }
+    }
+    class Game {
+        
+        struct tournamentMap{
+            int leftWing[];
         }
     }
 }
